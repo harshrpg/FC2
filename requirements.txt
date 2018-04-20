@@ -6,7 +6,6 @@ chardet==3.0.4
 click==6.7
 colorama==0.3.9
 cookiecutter==1.6.0
--e git+git@github.com:harshrpg/FC2.git@b4fa0c7c5f14f57b76b1930d53a78364003e27f1#egg=FC2
 future==0.16.0
 idna==2.6
 Jinja2==2.10
