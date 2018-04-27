@@ -18,8 +18,8 @@ class Aircraft():
     def get_AircraftData(self,path):
         """Return Airport Data"""
         if os.path.isfile(path):
-            self.__airport_df = pd.read_csv(path, encoding='utf-8')  # Aircraft Data
-            return self.__airport_df
+            self.__aircraft_df = pd.read_csv(path, encoding='utf-8')  # Aircraft Data
+            return self.__aircraft_df
         else:
             print("Aircraft File Not Found")
             return None

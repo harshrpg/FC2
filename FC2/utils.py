@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from colorama import init
 from termcolor import colored
+import csv
+import os
 init()
 class Utility:
     
@@ -80,7 +82,26 @@ class Utility:
         self.__merged.set_index('IATA', inplace=True)
 
         return self.__merged.to_dict(orient='index')
+    def to_csv(self,finalOp):
+        flag = False
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        filePath = dir_path+"output.csv"
+        self.displayStatusFormatMessage("Saving file at: {}\n".format(filePath))
 
+        try:
+            with open("output.csv", "w", newline='') as f:
+                writer = csv.writer(f)
+                try:
+                    flag=True
+                    writer.writerows(finalOp)
+                except StopAsyncIteration as identifier:
+                    flag=False
+                    self.displayErrFormatMessage("Iteration stoped. File cannot be created")
+        except PermissionError as err:
+            self.displayErrFormatMessage("{} is open. Please close the file and try again later".format(filePath))
+        if flag:
+            self.displaySuccessFormatMessage("Output File Created")
+            
 
     def displayStatusFormatMessage(self, message, params=""):
         message += str(params)

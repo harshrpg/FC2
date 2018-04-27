@@ -11,4 +11,6 @@ class Price:
         """This method gives the price based on the distane aircraft and currency"""
         return distance*currency
         
+            
+        
 
