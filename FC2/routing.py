@@ -31,92 +31,86 @@ class Routes:
         the shortest possible route within the graph taking
         index 0 of the input as the source. It also takes aircrafts into account in order to calculate
         for refueling"""
-        self.__airports = []  # List of all the airports provided in the input
-        # This is a list of linkedLists thay will hold each airports cost to another airports
-        self.__airportCost = []
-        # Airport Cost is actually a representation of a directed graph.
-        # If on index 0 in airports we have 'Dublin'
-        # Then on index 0 of airports cose we will have the edge values from 'Dublin' to other airports
-        # Similarly for all other airports
-        self.__previousVertex = []  # The previous vertex of the airport in the airports list
-        # This list will hold the previous vertex of all the airports
-        # This list will be our final least route
-        self.__visited = []  # An array of all visited airports
-        self.__unvisited = []  # An array of all unvisited airports
-        self.__utils = utils.Utility()
-        self.__acRange = -1
-        self.__price = price.Price()
-        self.__flag = False
-        self.__minDist = []
+
+        # Unvisited List holds all the airports. Since none of them are visited yet
         self.__unvisited= input[0][:]
+
+        # ========================================================================================================================
+        # This gives the aircraft information to get the Aircraft Range
         aircraft = input[1]
         if aircraft == None:
             self.__utils.displayWarningFormatMessage("No Aircraft provided. No refeuling charges will be calculated")
+            self.__acRange = None
         else:
             self.__acRange = aircrafts.get(aircraft)['range']  # Range of the aircraft
-        # print("Range of Aircrafts: ",self.__acRange)
+        # ========================================================================================================================
 
-        acCount=0
-        src = self.__unvisited[0]
-        sourceCurr = data.get(src)['toEUR']
-        iten = graph[0]
-        j=0
-        toEur = data.get(src)['toEUR']
-        while j< len(graph):
-            # print("SOURCE AIRPORT: ", src)
-            self.__airportCost=[]
-            self.__airports = []
-            indexVi = -1
-            # print(iten)
-            i = 0
-            while i< len(iten):
+        # ========================================================================================================================
+        # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/ ROUTING ALGORITHM BEGINHS /-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
+
+        src = self.__unvisited[0] # ------------------------ First Source ***************** The STARTING POINT
+        iten = graph[0] # ---------------------------------- Get the Starting airport's adjacency matrix
+        j=0 # ---------------------------------------------- Iterator for the graph
+
+        while j< len(graph): 
+            self.__airportCost = []  # --------------------- Cost [Distance]
+            self.__airports = [] # ------------------------- Holds the intenerary of the minimum cost
+            indexVi = -1 # --------------------------------- Index of the visited airports
+            
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: MINIMUM DISTANCE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            # Getting the minimum distance from the source to next airport out of all the aiports 
+            i = 0 # ---------------------------------------- Iterator
+            while i< len(iten): # -------------------------- Iterate to get the list of all the distances from the source
                 distance = iten[i][1]
                 dest = self.__unvisited[i]
-                flag=True
                 if not (distance == 0):
-                    legCost = self.__price.getPrice(distance,1)
-                    self.__airportCost.append(legCost)
-                    self.__airports.append([src,dest])
-                    # print("\tFrom {} -> {}: \u20ac {}".format(src, dest, legCost))
+                    self.__airportCost.append(distance) # -- Distances that are not zero 
+                    self.__airports.append([src,dest]) # --- Airports in each distances
                 i+=1
-             # Minimum Cost Calculation below
-            minimumCost = min(self.__airportCost)
-            self.__minDist.append(minimumCost)
+
+            minimumCost = min(self.__airportCost) # -------- Get the Minimum Cost
+            self.__minDist.append(minimumCost) # ----------- List with minimum cost [Used as final route]
             # print('Airport Cost:==================================== ',self.__airportCost)
-            # Index of the minimum distance selected so that we can get the next airport as the source
-            indexMin = self.__airportCost.index(minimumCost)
-            # getting the next source airport here
-            airports = self.__airports[indexMin]
-            # print("======================airports: ",airports[0])
-            # From unvisited we need the index of the last visited airport
-            indexVisited = self.__unvisited.index(airports[0])
-            # POP out all the visited sources values from the graph
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: MINIMUM DISTANCE [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: REMOVE PREVIOUS SOURCE FROM GRAPH <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            # Setting the destination calculated above as the new source
+            indexMin = self.__airportCost.index(minimumCost) # ----- Index of the minimum distance selected so that we can get the next airport as the source
+            airports = self.__airports[indexMin] # ----------------- getting the next source airport here
+            indexVisited = self.__unvisited.index(airports[0]) # --- From unvisited we need the index of the last visited airport
+            # ------ <POP: visited sources values from the graph>
             for k in range(len(graph)):
                 graph[k].pop(indexVisited)
-            if self.__visited == []:
-                sourceAirport = airports[0]
-                sourceAirportCost = self.__airportCost
-            # pop the visited airport from unvisited to visited list 
-            self.__visited.append(self.__unvisited.pop(indexVisited))
-            # New source
-            presrc = airports[0]
-            src = airports[1]   
+            # ------ </POP>
+
+            # if self.__visited == []:
+            #     sourceAirport = airports[0]
+            #     sourceAirportCost = self.__airportCost
+             
+            self.__visited.append(self.__unvisited.pop(indexVisited)) # pop the visited airport from unvisited to visited list
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: REMOVE PREVIOUS SOURCE FROM GRAPH [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: NEW SOURCE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            presrc = airports[0] # -------------- PREVIOUS SOURCE
+            src = airports[1] # ----------------- NEW SOURCE
             indexVi = input[0].index(src)
-            # print("Index Visited:::::", indexVi)
-            iten = graph[indexVi]
+            iten = graph[indexVi]  # ------------ Graph List for the new source
             # self.__utils.displaySuccessFormatMessage(
             #     "\n\t{} -> {} Cost: \u20ac{:.2f}".format(presrc, src, minimumCost))
             # print("-------------------------------------------\n")
-            # print("UNVISITED: ",self.__unvisited)
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: NEW SOURCE [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: FINAL LEG <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             if len(self.__unvisited) == 1:
                 self.__visited.append(self.__unvisited[-1])
-                # print("Final Leg")
                 # self.__utils.displaySuccessFormatMessage("\n\t{} -> {}. Cost: \u20ac{:.2f}".format(airports[0], sourceAirport, sourceAirportCost[indexVi-1]))
                 # print("VISITED: ", self.__visited)
                 break
             # print("VISITED: ", self.__visited)
+            #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: FINAL LEG [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            # ========================================================================================================================
             j+=1
-        return self.__visited,self.__minDist,self.__acRange
+        return self.__visited,self.__minDist,self.__acRange,aircraft
 
     def isPossible(self,aircraftRange,routeDistances):
         count=0

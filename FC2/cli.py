@@ -5,6 +5,7 @@ from FC2 import airport
 from FC2 import country
 from FC2 import currency
 from FC2 import itenerary
+from FC2 import price
 import routing
 import time
 @click.command()
@@ -18,7 +19,6 @@ def main(file):
     country_obj = country.Country() 
     utils_obj = utils.Utility()
     it_obj = itenerary.Itenerary()
-    _route = routing.Routes()
 
     # Getting the data
     airports = airport_obj.get_AirportData('./data/airports_new.csv')
@@ -37,41 +37,36 @@ def main(file):
     else:
         finalCSV = []
         for routes in testRoutes:
-            # print("Route: ",routes)
-            # time.sleep(2)
+            _route = routing.Routes()
             locations = []
             cleanedInput = utils_obj.checkInputErrors(routes, airports, aircrafts)
-            # print("cleanedInput: ",cleanedInput)
-            # time.sleep(2)
             filteredData = it_obj.getIteneraryData(cleanedInput,mergedData)
             for locs in cleanedInput[0]:
                 locations.append((filteredData.get(locs).get('Latitude'),filteredData.get(locs).get('Longitude')))
-            # print("Locations: ",locations)
-            # time.sleep(2)
             airportAdjGraph = it_obj.getAdjacencyGraph(locations)
-            # print("Airport Adj Graph: ",airportAdjGraph)
-            # time.sleep(2)
-            routeList,routeDistances,airCRange=_route.getRoute(airportAdjGraph,cleanedInput,_aircraftsDict,filteredData)
-            isRoutePossible = _route.isPossible(airCRange, routeDistances)
-            # print("{}\n{}\n{}".format(routeList,routeDistances,airCRange))
-            if isRoutePossible:
-                # print("Possible")
-                finalRoute, finalDistances = _route.getFinalAcRoute(
-                    airCRange, routeList, routeDistances)
-                # print("Final Route: {}\n, Final Distances: {}".format(finalRoute,finalDistances))
-                totalDistance = sum(finalDistances)
-                finalRoute.append(totalDistance)
-                finalCSV.append(finalRoute)
+            routeList,routeDistances,airCRange,aircraft_type=_route.getRoute(airportAdjGraph,cleanedInput,_aircraftsDict,filteredData)
+            if not airCRange == None:
+                isRoutePossible = _route.isPossible(airCRange, routeDistances)
+                if isRoutePossible:
+                    finalRoute, finalDistances = _route.getFinalAcRoute(
+                        airCRange, routeList, routeDistances)
+                    totalDistance = sum(finalDistances)
+                    _price = price.Price()
+                    finalRoute, finalPrice = _price.getPrice(
+                        finalRoute, finalDistances, filteredData, airCRange)
+                    finalRoute.append(aircraft_type)
+                    finalRoute.append(finalPrice)
+                    finalCSV.append(finalRoute)
+                else:
+                    total_distance="Route Not Possible"
+                    ogRoute = list(cleanedInput[0])
+                    ogRoute.append(aircraft_type)
+                    ogRoute.append("No Route")
+                    finalCSV.append(ogRoute)
             else:
-                # print("Not Possible")
-                total_distance="Route Not Possible"
-                ogRoute = list(cleanedInput[0])
-                print("OG::::::::::::", ogRoute)
-                ogRoute.append("No Route")
-                print("FInal OG ROUTE::::::::::",ogRoute)
-                finalCSV.append(ogRoute)
-                # utils_obj.to_csv(cleanedInput,total_distance)
-        print(finalCSV)
+                total_distance = sum(routeDistances)
+                routeList.append(total_distance)
+                finalCSV.append(routeList)
         if not finalCSV == []:
             utils_obj.to_csv(finalCSV)
     
