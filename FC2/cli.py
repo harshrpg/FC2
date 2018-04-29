@@ -6,10 +6,12 @@ from FC2 import country
 from FC2 import currency
 from FC2 import itenerary
 from FC2 import price
-import routing
+from FC2 import routing
 import time
+import networkx as nx
+import pandas as pd
 @click.command()
-@click.argument("file", type=click.Path(exists=True), default="./data/testroutes.csv")
+@click.argument("file", type=click.Path(exists=True), default="./data/testroutes.csv")  
 def main(file):
     
     # Creating the required Objects
@@ -56,7 +58,9 @@ def main(file):
                 "\t\t[Intinerary Generated]", color="cyan")
             utils_obj.displayManFormatMessage(
                 "\t\t[Finding Route -----------------------]", color="cyan")
-            routeList,routeDistances,airCRange,aircraft_type=_route.getRoute(airportAdjGraph,cleanedInput,_aircraftsDict,filteredData)
+            airCRange,aircraft_type = utils_obj.isAircraft(cleanedInput,_aircraftsDict)
+            routeList,routeDistances,Ngraph =_route.getRoute(airportAdjGraph,cleanedInput,filteredData)
+            utils_obj.drawGraph(cleanedInput,Ngraph)
             if not airCRange == None:
                 isRoutePossible = _route.isPossible(airCRange, routeDistances)
                 if isRoutePossible:

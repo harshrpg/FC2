@@ -1,4 +1,4 @@
-import utils
+from FC2 import utils
 class Price:
     """This class will calculate the
     price of each itenerary taking into

@@ -33,7 +33,6 @@ class Itenerary:
         phi2 = (90-latitude2)*(2*pi)/360  # Radians
         return acos(sin(phi1)*sin(phi2)*cos(theta1-theta2) + cos(phi1)*cos(phi2))*self.__radiusEarth
 
-
     def getAdjacencyGraph(self,locations):
         """This method will return an adjacency
         list of the airports graph in interest"""

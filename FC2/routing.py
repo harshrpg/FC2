@@ -1,6 +1,7 @@
 from FC2 import utils
 from FC2 import price
 import unicodedata
+import networkx as nx
 class Routes:
 
     """ Class to calculate the Shortest path using Dijkstra Algo"""
@@ -12,19 +13,13 @@ class Routes:
         # If on index 0 in airports we have 'Dublin'
         # Then on index 0 of airports cose we will have the edge values from 'Dublin' to other airports
         # Similarly for all other airports
-        self.__previousVertex = [] # The previous vertex of the airport in the airports list
-        # This list will hold the previous vertex of all the airports
-        # This list will be our final least route
         self.__visited = [] # An array of all visited airports
         self.__unvisited = [] # An array of all unvisited airports
         self.__utils = utils.Utility()
-        self.__acRange = -1
-        self.__price = price.Price()
-        self.__flag=False
         self.__minDist=[]
 
-    def getRoute(self, graph, input, aircrafts,data):
-        
+    def getRoute(self, graph, input,data):
+
         """ This method takes 4 arguments: graph = Adjaceny matrix of the airports, 
         input = list of the airports, aircrafts = aircrafts data, data=filteredData.
         This method uses the understanding of Dijkstra's algorithm to get
@@ -32,18 +27,11 @@ class Routes:
         index 0 of the input as the source. It also takes aircrafts into account in order to calculate
         for refueling"""
 
+        self.__G = nx.Graph()
         # Unvisited List holds all the airports. Since none of them are visited yet
         self.__unvisited= input[0][:]
 
-        # ========================================================================================================================
-        # This gives the aircraft information to get the Aircraft Range
-        aircraft = input[1]
-        if aircraft == None:
-            self.__utils.displayWarningFormatMessage("\tNo Aircraft provided. No refeuling charges will be calculated")
-            self.__acRange = None
-        else:
-            self.__acRange = aircrafts.get(aircraft)['range']  # Range of the aircraft
-        # ========================================================================================================================
+        
 
         # ========================================================================================================================
         # -/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/ ROUTING ALGORITHM BEGINHS /-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/
@@ -91,6 +79,13 @@ class Routes:
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: NEW SOURCE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             presrc = airports[0] # -------------- PREVIOUS SOURCE
             src = airports[1] # ----------------- NEW SOURCE
+            edge = (presrc,src)
+            self.__G.add_node(presrc)
+            self.__G.add_node(src)
+            # self.__G.nodes[j]['lab'] = presrc
+            # self.__G.nodes[j+1]['lab'] = src
+            self.__G.add_edge(presrc, src, weight=str(round(minimumCost, 2)))
+
             indexVi = input[0].index(src)
             iten = graph[indexVi]  # ------------ Graph List for the new source
             self.__utils.displayManFormatMessage(
@@ -99,13 +94,16 @@ class Routes:
 
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: FINAL LEG <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             if len(self.__unvisited) == 1:
+                self.__G.add_edge(
+                    airports[1], sourceAirport, weight=str(round(sourceAirportCost[indexVi-1], 2)))
                 self.__visited.append(self.__unvisited[-1])
                 self.__utils.displayManFormatMessage("\n\t\t\t\t{} -> {}. Cost: {:.2f}km".format(airports[1], sourceAirport, sourceAirportCost[indexVi-1]),color="cyan")
                 break
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: FINAL LEG [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             # ========================================================================================================================
             j+=1
-        return self.__visited,self.__minDist,self.__acRange,aircraft
+        
+        return self.__visited,self.__minDist,self.__G
 
     def isPossible(self,aircraftRange,routeDistances):
         count=0

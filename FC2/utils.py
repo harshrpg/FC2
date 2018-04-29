@@ -5,6 +5,9 @@ from colorama import init
 from termcolor import colored
 import csv
 import os
+import networkx as nx
+import matplotlib.pyplot as plt
+import errno
 init()
 class Utility:
     
@@ -89,14 +92,63 @@ class Utility:
 
         return self.__merged.to_dict(orient='index')
    
+    def drawGraph(self,input,G):
+        #  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DISPLAY THE WEIGHTED GRAPH <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        filePath = os.path.join(dir_path, "outputs")
+        try:
+            os.makedirs(filePath)
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+        plotPath = "plot"+''.join(input[0])+".png"
+        finPlot = os.path.join(filePath,plotPath)
+        edgesL = [(u, v) for (u, v, d) in G.edges(data=True)]
+        labels = nx.get_edge_attributes(G, 'weight')
+        pos = nx.spring_layout(G)
+        plt.figure()
+        nx.draw_networkx_nodes(
+            G, pos, node_size=1000, alpha=0.8, node_shape='s')
+        nx.draw_networkx_edges(G, pos, edgelist=edgesL,
+                               width=8, alpha=0.5, edge_color='r')
+        nx.draw_networkx_labels(
+            G, pos, font_size=10, font_family='sans-serif')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+        plt.axis('off')
+        plt.savefig(finPlot)
+        #  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DISPLAY THE WEIGHTED GRAPH [OVER]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    
+    def isAircraft(self,input,aircrafts):
+        # ========================================================================================================================
+        # This gives the aircraft information to get the Aircraft Range
+        aircraft = input[1]
+        if aircraft == None:
+            self.displayWarningFormatMessage(
+                "\tNo Aircraft provided. No refeuling charges will be calculated")
+            __acRange = None
+        else:
+            __acRange = aircrafts.get(
+                aircraft)['range']  # Range of the aircraft
+            __units = aircrafts.get(aircraft)['units']
+            if __units.strip() == 'imperial':
+                __acRange *= 1.6093
+        # ========================================================================================================================
+        return __acRange,aircraft
+    
     def to_csv(self,finalOp):
         flag = False
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        filePath = dir_path+"\output.csv"
+        try:
+            os.path.join(dir_path, "outputs")
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+        filePath = os.path.join(dir_path,"outputs","output.csv")
         self.displayStatusFormatMessage("\tSaving file at: {}\n".format(filePath))
 
         try:
-            with open("output.csv", "w", newline='') as f:
+            with open(filePath, "w", newline='') as f:
                 writer = csv.writer(f)
                 try:
                     flag=True
