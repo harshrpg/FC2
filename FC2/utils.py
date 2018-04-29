@@ -20,7 +20,8 @@ class Utility:
     # Reads Test Input File
     def handleTestInput(self,path):
         self.displayStatusFormatMessage(
-            "Reading File: ", params=path)
+            "\tReading File: ", params=path)
+        self.displayStatusFormatMessage("\tTest: Duplicate Airport")
         with open(path,'r') as csvfile:
             airports = csv.reader(csvfile)
             for i,rows in enumerate(airports):
@@ -31,29 +32,33 @@ class Utility:
                 else:
                     self.__testRoutes.append(rows)
         csvfile.close()
+        self.displaySuccessFormatMessage("\tTest: Duplicate Airport -- COMPLETE")
         return self.__testRoutes
     
     # Handles Errors from the test input file
     def checkInputErrors(self,testAirports,allAirports,allAircrafts):
         self.displayStatusFormatMessage(
-            "Checking for data Errors in: ", params=testAirports)
+            "\tChecking for data Errors in: ", params=testAirports)
         # ---------- 1. Check if there is a Aircraft provided then split the aircraft and airports
         testAircraft = testAirports[-1] # ----------------------------------- Check The last item in the list (Expected position for a Aircraft)
         isAircraft = allAircrafts['code'].isin([testAircraft]) # ------------ Check if this item is in our Aircrafts Data
+        self.displayStatusFormatMessage("\tTest: Aircraft Provided?")
         if (np.sum(isAircraft)==0): # --------------------------------------- If Aircraft not found in the data, then aircraft not provided
             self.displayWarningFormatMessage(
-                "Aircraft Not Provided in: ", params=testAirports)  # Display Message to user
+                "\tAircraft Not Provided in: ", params=testAirports)  # Display Message to user
             self.__airports_List = testAirports # --------------------------- If not an aircraft then must be all airports
             self.__aircraft = None
         elif (np.sum(isAircraft)==1): # ------------------------------------- If an aircraft is found
             self.__aircraft = testAircraft # -------------------------------- Then set it to aircraft
             self.__airports_List = testAirports[:-1] # ---------------------- Set the airports to all the values except the last one
-        
+        self.displaySuccessFormatMessage(
+            "\tTest: Aircraft Provided? -- COMPLETE")
         # ---------- 2. Check the number of airports
+        self.displayStatusFormatMessage("\tTest: Number of Airports Provided")
         lengthAirports = len(self.__airports_List) # ------------------------ Length of the airports list
         if not (lengthAirports>=2 and lengthAirports<=5): # ----------------- There must be atleast 2 airports and maximum of 5 airports
             self.displayErrFormatMessage(
-                "There number of airports provided is not between 2 and 5: ", params=self.__airports_List)
+                "\tThere number of airports provided is not between 2 and 5: ", params=self.__airports_List)
         else:
             # ------ 3. If the number of airports is right. Check if they are present in the data
             isAirports = allAirports['IATA'].isin(self.__airports_List) # --- Check if the airports provided is in our data
@@ -62,8 +67,9 @@ class Utility:
             else:
                 self.displayErrFormatMessage(
                     "Error in the Airports provided in the test file. Not in the airports_new.csv file")
+        self.displaySuccessFormatMessage("\tTest: Number of Airports Provided -- COMPLETE")
         self.displaySuccessFormatMessage(
-            "Data Checks Completed in: ", params=testAirports)
+            "\tData Checks Completed in: ", params=testAirports)
         return (self.__cleanedInput,self.__aircraft) # ---------------------- Checks Completed
     
     def getDict(self,df1, df2, df3):
@@ -82,11 +88,12 @@ class Utility:
         self.__merged.set_index('IATA', inplace=True)
 
         return self.__merged.to_dict(orient='index')
+   
     def to_csv(self,finalOp):
         flag = False
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        filePath = dir_path+"output.csv"
-        self.displayStatusFormatMessage("Saving file at: {}\n".format(filePath))
+        filePath = dir_path+"\output.csv"
+        self.displayStatusFormatMessage("\tSaving file at: {}\n".format(filePath))
 
         try:
             with open("output.csv", "w", newline='') as f:
@@ -100,9 +107,8 @@ class Utility:
         except PermissionError as err:
             self.displayErrFormatMessage("{} is open. Please close the file and try again later".format(filePath))
         if flag:
-            self.displaySuccessFormatMessage("Output File Created")
+            self.displaySuccessFormatMessage("\tOutput File Created")
             
-
     def displayStatusFormatMessage(self, message, params=""):
         message += str(params)
         print(colored(str("STATUS::"+message), 'blue'))
@@ -120,9 +126,11 @@ class Utility:
 
     def displaySuccessFormatMessage(self, message, params=""):
         message += str(params)
-        print(colored(message, 'green'))
+        print(colored(str("SUCCESS::"+message), 'green'))
         print()
         
-
+    def displayManFormatMessage(self,message,color="magenta"):
+        print(colored(message, color))
+        print()
 
 

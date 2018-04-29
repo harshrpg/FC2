@@ -39,7 +39,7 @@ class Routes:
         # This gives the aircraft information to get the Aircraft Range
         aircraft = input[1]
         if aircraft == None:
-            self.__utils.displayWarningFormatMessage("No Aircraft provided. No refeuling charges will be calculated")
+            self.__utils.displayWarningFormatMessage("\tNo Aircraft provided. No refeuling charges will be calculated")
             self.__acRange = None
         else:
             self.__acRange = aircrafts.get(aircraft)['range']  # Range of the aircraft
@@ -67,10 +67,8 @@ class Routes:
                     self.__airportCost.append(distance) # -- Distances that are not zero 
                     self.__airports.append([src,dest]) # --- Airports in each distances
                 i+=1
-
             minimumCost = min(self.__airportCost) # -------- Get the Minimum Cost
             self.__minDist.append(minimumCost) # ----------- List with minimum cost [Used as final route]
-            # print('Airport Cost:==================================== ',self.__airportCost)
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: MINIMUM DISTANCE [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: REMOVE PREVIOUS SOURCE FROM GRAPH <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -83,9 +81,9 @@ class Routes:
                 graph[k].pop(indexVisited)
             # ------ </POP>
 
-            # if self.__visited == []:
-            #     sourceAirport = airports[0]
-            #     sourceAirportCost = self.__airportCost
+            if self.__visited == []:
+                sourceAirport = airports[0]
+                sourceAirportCost = self.__airportCost
              
             self.__visited.append(self.__unvisited.pop(indexVisited)) # pop the visited airport from unvisited to visited list
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: REMOVE PREVIOUS SOURCE FROM GRAPH [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -95,18 +93,15 @@ class Routes:
             src = airports[1] # ----------------- NEW SOURCE
             indexVi = input[0].index(src)
             iten = graph[indexVi]  # ------------ Graph List for the new source
-            # self.__utils.displaySuccessFormatMessage(
-            #     "\n\t{} -> {} Cost: \u20ac{:.2f}".format(presrc, src, minimumCost))
-            # print("-------------------------------------------\n")
+            self.__utils.displayManFormatMessage(
+                "\n\t\t\t\t{} -> {} Distance: {:.2f}km".format(presrc, src, minimumCost),color="cyan")
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: NEW SOURCE [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: FINAL LEG <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             if len(self.__unvisited) == 1:
                 self.__visited.append(self.__unvisited[-1])
-                # self.__utils.displaySuccessFormatMessage("\n\t{} -> {}. Cost: \u20ac{:.2f}".format(airports[0], sourceAirport, sourceAirportCost[indexVi-1]))
-                # print("VISITED: ", self.__visited)
+                self.__utils.displayManFormatMessage("\n\t\t\t\t{} -> {}. Cost: {:.2f}km".format(airports[1], sourceAirport, sourceAirportCost[indexVi-1]),color="cyan")
                 break
-            # print("VISITED: ", self.__visited)
             #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> CALCULATION: FINAL LEG [OVER] <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
             # ========================================================================================================================
             j+=1

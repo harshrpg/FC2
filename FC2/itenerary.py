@@ -43,7 +43,6 @@ class Itenerary:
             self.__utils.displayErrFormatMessage('Locations are not with required range')
             return None
         else:
-            self.__utils.displayStatusFormatMessage('Creating the Graph and the Adjacency List')
             __adjacencyList = [[]*x for x in range(len(locations))]  # --- Adjaceny List that will hold adjacent vertex of the node of interest in graph
             for j,src in enumerate(locations):
                 self.__linkList = linkList.LinkList()

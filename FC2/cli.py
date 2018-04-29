@@ -29,9 +29,11 @@ def main(file):
 
     
     # Pass this file to Utility to check for errors
+    utils_obj.displayStatusFormatMessage("\tParsing Inputs for Errors")
     testRoutes = utils_obj.handleTestInput(file)
     mergedData = utils_obj.getDict(airports, curr, countries[[
                                    'name', 'currency_alphabetic_code']])
+    utils_obj.displaySuccessFormatMessage("\tParsing Inputs for Errors -- COMPLETE")
     if len(testRoutes) == 0:
         print("None of the Test Lists had unique airports. Please try again")
     else:
@@ -39,11 +41,21 @@ def main(file):
         for routes in testRoutes:
             _route = routing.Routes()
             locations = []
+            utils_obj.displayStatusFormatMessage("\tCleaning Individual Inputs")
             cleanedInput = utils_obj.checkInputErrors(routes, airports, aircrafts)
+            utils_obj.displaySuccessFormatMessage(
+                "\tCleaning Individual Inputs -- COMPLETE")
+            hashes = '#'*150
+            utils_obj.displayManFormatMessage("{} \n\t\t\tCalculating Shortest Route for {}\n{}".format(hashes,cleanedInput,hashes))
+            utils_obj.displayManFormatMessage("\t\t[Generating Intinerary]",color="cyan")
             filteredData = it_obj.getIteneraryData(cleanedInput,mergedData)
             for locs in cleanedInput[0]:
                 locations.append((filteredData.get(locs).get('Latitude'),filteredData.get(locs).get('Longitude')))
             airportAdjGraph = it_obj.getAdjacencyGraph(locations)
+            utils_obj.displayManFormatMessage(
+                "\t\t[Intinerary Generated]", color="cyan")
+            utils_obj.displayManFormatMessage(
+                "\t\t[Finding Route -----------------------]", color="cyan")
             routeList,routeDistances,airCRange,aircraft_type=_route.getRoute(airportAdjGraph,cleanedInput,_aircraftsDict,filteredData)
             if not airCRange == None:
                 isRoutePossible = _route.isPossible(airCRange, routeDistances)
@@ -57,16 +69,27 @@ def main(file):
                     finalRoute.append(aircraft_type)
                     finalRoute.append(finalPrice)
                     finalCSV.append(finalRoute)
+                    utils_obj.displayManFormatMessage("{}".format(hashes))
+                    utils_obj.displayManFormatMessage(
+                        "\tROUTE GENERATED: {} CALCULATED PRICE: \u20ac{:.2f}".format(finalRoute[:-1], finalRoute[-1]), color="green")
+                    utils_obj.displayManFormatMessage("{}".format(hashes))
                 else:
                     total_distance="Route Not Possible"
                     ogRoute = list(cleanedInput[0])
                     ogRoute.append(aircraft_type)
                     ogRoute.append("No Route")
                     finalCSV.append(ogRoute)
+                    utils_obj.displayManFormatMessage("{}".format(hashes))
+                    utils_obj.displayManFormatMessage("\t ROUTE: {} AIRCRAFT CANNOT MAKE THE JOURNEY TRY AGAIN".format(finalRoute[:-1]),color="red")
+                    utils_obj.displayManFormatMessage("{}".format(hashes))
             else:
                 total_distance = sum(routeDistances)
                 routeList.append(total_distance)
                 finalCSV.append(routeList)
+                utils_obj.displayManFormatMessage("{}".format(hashes))
+                utils_obj.displayManFormatMessage(
+                    "\tROUTE GENERATED: {} No Aircraft. CALCULATED DISTANCE: {:.2f}km".format(routeList[:-1], routeList[-1]), color="yellow")
+                utils_obj.displayManFormatMessage("{}".format(hashes))
         if not finalCSV == []:
             utils_obj.to_csv(finalCSV)
     
