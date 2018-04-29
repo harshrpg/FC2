@@ -2,7 +2,5 @@ click==6.7
 colorama==0.2.7
 matplotlib==2.1.0
 networkx==2.0
-numpy==1.13.3
-numpydoc==0.7.0
 pandas==0.20.3
 termcolor==1.1.0
