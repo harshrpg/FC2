@@ -10,8 +10,9 @@ from FC2 import routing
 import time
 import networkx as nx
 import pandas as pd
+import os,FC2
 @click.command()
-@click.argument("file", type=click.Path(exists=True), default="./data/testroutes.csv")  
+@click.argument("file", type=click.Path(exists=True), default=os.path.join(FC2.__path__[0], 'data', 'testroutes.csv'))
 def main(file):
     
     # Creating the required Objects
@@ -23,10 +24,13 @@ def main(file):
     it_obj = itenerary.Itenerary()
 
     # Getting the data
-    airports = airport_obj.get_AirportData('./data/airports_new.csv')
-    curr = currency_obj.get_CurrencyData('./data/currencyrates.csv')
-    countries = country_obj.get_CountryData('./data/countrycurrency.csv')
-    aircrafts = aircraft_obj.get_AircraftData('./data/aircraft.csv')
+    airports = airport_obj.get_AirportData(os.path.join(FC2.__path__[0], 'data', 'airports_new.csv'))
+    curr = currency_obj.get_CurrencyData(os.path.join(
+        FC2.__path__[0], 'data', 'currencyrates.csv'))
+    countries = country_obj.get_CountryData(
+        os.path.join(FC2.__path__[0], 'data', 'countrycurrency.csv'))
+    aircrafts = aircraft_obj.get_AircraftData(
+        os.path.join(FC2.__path__[0], 'data', 'aircraft.csv'))
     _aircraftsDict = aircrafts.set_index('code').to_dict(orient='index')
 
     

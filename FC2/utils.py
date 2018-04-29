@@ -94,8 +94,7 @@ class Utility:
    
     def drawGraph(self,input,G):
         #  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> DISPLAY THE WEIGHTED GRAPH <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        filePath = os.path.join(dir_path, "outputs")
+        filePath = os.path.join(os.getcwd(), "outputs")
         try:
             os.makedirs(filePath)
         except OSError as exc:  # Guard against race condition
@@ -138,13 +137,12 @@ class Utility:
     
     def to_csv(self,finalOp):
         flag = False
-        dir_path = os.path.dirname(os.path.realpath(__file__))
         try:
-            os.path.join(dir_path, "outputs")
+            os.makedirs(os.path.join(os.getcwd(), "outputs"))
         except OSError as exc:  # Guard against race condition
             if exc.errno != errno.EEXIST:
                 raise
-        filePath = os.path.join(dir_path,"outputs","output.csv")
+        filePath = os.path.join(os.getcwd(), "outputs", "output.csv")
         self.displayStatusFormatMessage("\tSaving file at: {}\n".format(filePath))
 
         try:
