@@ -88,7 +88,8 @@ def main(file):
                     ogRoute.append("No Route")
                     finalCSV.append(ogRoute)
                     utils_obj.displayManFormatMessage("{}".format(hashes))
-                    utils_obj.displayManFormatMessage("\t ROUTE: {} AIRCRAFT CANNOT MAKE THE JOURNEY TRY AGAIN".format(finalRoute[:-1]),color="red")
+                    utils_obj.displayManFormatMessage(
+                        "\t ROUTE: {} AIRCRAFT CANNOT MAKE THE JOURNEY TRY AGAIN".format(ogRoute[:-1]), color="red")
                     utils_obj.displayManFormatMessage("{}".format(hashes))
             else:
                 total_distance = sum(routeDistances)

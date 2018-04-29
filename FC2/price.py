@@ -10,36 +10,36 @@ class Price:
     def getPrice(self,route,distance,input,acRange):
         """This method gives the price based on the distane aircraft and currency"""
 
-        # If aircraft Range > than the entire distance then refuel only for the distance to be travelled
         totalDistance = sum(distance)
-        sum_distances = 0
-        totalPrice = -1
-        sumPrice = 0
+        sumCost = 0
         toEUR = input.get(route[0])['toEUR']
+        # If the range of the aircraft is more than the entire journey. then fill in only journey distance fuel
         if acRange>totalDistance:
-            totalPrice = totalDistance*toEUR
-            sumPrice+=totalPrice
+            totalCost = totalDistance*toEUR
+            sumCost+=totalCost
         else:
             i = 0
-            fuelConsumed = 0
+            totalCost = 0
+            fuelRemaining = acRange
+            sumCost = acRange*toEUR
             while i < len(distance):
-                sum_distances+=distance[i]
-                if not acRange >= sum_distances:
-                    if i == (len(distance)-1):
-                        remainingDistance = fuelConsumed-distance[i]
-                        toEUR = input.get(route[i])['toEUR']
-                        totalPrice = (acRange-fuelConsumed)*toEUR
-                        sumPrice += totalPrice
-                    else:
-                        toEUR = input.get(route[i])['toEUR']
-                        totalPrice = (acRange-fuelConsumed)*toEUR
-                        sumPrice += totalPrice
-                        sum_distances = 0 + distance[i]
-                        fuelConsumed = acRange - sum_distances
+                # Get the currency value in Euros for the city
+                toEUR = input.get(route[i])['toEUR']
+                # No refuel until the fuel remaining is less than the distance for next leg
+                if (fuelRemaining - distance[i]) >=0:
+                    fuelRemaining -= distance[i]
                 else:
-                    fuelConsumed = acRange - sum_distances
+                    # If refueling is needed on the last leg. Dont fill to max just fill what is needed
+                    if i == (len(distance)-1):
+                        remainingDistance = fuelRemaining-distance[i]  
+                        totalCost = remainingDistance*toEUR
+                    # Refuel from whatever fuel is remaining to the max capacity and calculate the price in euros
+                    else:
+                        totalCost = (acRange-fuelRemaining)*toEUR
+                        fuelRemaining = acRange
+                sumCost+=totalCost
                 i+=1
-        return route,sumPrice
+        return route,sumCost
             
         
 
