@@ -30,26 +30,38 @@ Prerequisites
 Installation
 -------------
 
-1. Create a Python environment
->> $ conda create -n myenv Python=3.6
+1. Create a Python environment::
 
-2. Install the project [Note: all the dependencies will be installed]
->> $ pip install git+https://github.com/harshrpg/FC2
+    >> $ conda create -n myenv Python=3.6
+
+2. Install the project [Note: all the dependencies will be installed]::
+
+    >> $ pip install git+https://github.com/harshrpg/FC2
 
 OR
-1. Clone this repository
->> $ git clone https://github.com/harshrpg/FC2
-2. Move in the Repository folder. Make sure you have the file ``setup.py``
->> cd FC2 
-3. Create environment from the provided environment file
->> conda env create -f environment.yml
-4. Install the project
->> pip install -e .
+
+1. Clone this repository::
+
+    >> $ git clone https://github.com/harshrpg/FC2
+    
+2. Move in the Repository folder. Make sure you have the file ``setup.py``::
+
+    >> cd FC2 
+
+3. Create environment from the provided environment file::
+
+    >> conda env create -f environment.yml
+
+4. Install the project::
+
+    >> pip install -e .
 
 Execution
 ----------
+1. Run the following command to execute::
 
->> $ FC2 './pathto/testfile.csv'
+    >> $ FC2 './pathto/testfile.csv'
+    
 The execution creates an outputs folder in your current working directory. 
 
 Credits
