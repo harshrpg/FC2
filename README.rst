@@ -50,7 +50,7 @@ OR
 
 3. Create environment from the provided environment file::
 
-    >> conda env create -f environment.yml
+    >> conda env create -f=environment.yml
 
 4. Install the project::
 
