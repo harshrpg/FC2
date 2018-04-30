@@ -5,6 +5,7 @@ Fuel Capacity Calculator
 This software will calculate the most economic routes for an aircraft as per the fuel consumption. Please note that
 the pdf document has a more comprehensive How to Use? information.
 
+This project was created in a Python 3.6 environment. It will be easier to set up the project if you install [Anaconda](https://conda.io/docs/user-guide/install/download.html) or [Miniconda](https://conda.io/miniconda.html). Other options, such as [PyEnv](https://github.com/pyenv/pyenv) and classic virtual environment (i.e. `venv`), will also work.
 
 * Free software: MIT license
 * Documentation: https://FC2.readthedocs.io.
@@ -35,10 +36,18 @@ Installation
 `` $ pip install git+https://github.com/harshrpg/FC2
 This will install all the requirements
 
+OR
+
+`` $ git clone https://github.com/harshrpg/FC2
+`` cd FC2 
+`` conda env create -f environment.yml
+`` pip install -e .
+
 Execution
 ----------
 
 `` $ FC2 'testfilepath'
+The execution creates an outputs folder in your current working directory. 
 
 Credits
 -------
